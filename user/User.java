@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @NonNull
-    private String phone_number;
+    private String phone;
     @NonNull
     private String password;
     @NonNull
@@ -53,7 +53,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return phone_number;
+        return phone;
     }
 
     @Override
