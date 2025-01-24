@@ -1,16 +1,21 @@
 package com.example.animal_feed.config;
 
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -22,7 +27,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
     private static final long jwtExp = 1000 * 60 * 60; // 60 minute
-    // private static final long jwtRefreshExp = 1000 * 60 * 60 * 24 * 7; // 1 week
+    private static final long jwtRefreshExp = 1000 * 60 * 60 * 24 * 7; // 1 week
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -37,11 +42,22 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails, jwtExp, "ACCESS");
     }
 
+    public String generateRefreshToken(UserDetails userDetails) {
+        return generateRefreshToken(new HashMap<>(), userDetails, jwtRefreshExp, "REFRESH");
+    }
+
     public String generateToken(
             Map<String, Object> extractClaims,
             UserDetails userDetails,
             long expTime,
             String tokenType) {
+        Collection<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
+        extractClaims.put("roles", authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                .collect(Collectors.toList()));
+
+        extractClaims.put("tokenType", tokenType);
         return Jwts
                 .builder()
                 .setClaims(extractClaims)
@@ -50,6 +66,39 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String generateRefreshToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails,
+            long expTime,
+            String tokenType) {
+        extraClaims.put("tokenType", tokenType);
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expTime))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String extractTokenType(String token) {
+        Claims claims = extractAllClaims(token);
+        return (String) claims.get("tokenType");
+    }
+
+    public boolean isTokenValid(String jwt) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(jwt);
+            return !isTokenExpired(jwt);
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
