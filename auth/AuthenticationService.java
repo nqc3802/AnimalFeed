@@ -69,11 +69,6 @@ public class AuthenticationService {
                         .body(new RefreshTokenResponse(null, "User not found"));
             }
             Users user = userOptional.get();
-            // UserDetails userDetails = new User(
-            // user.getPhone(),
-            // user.getPassword(),
-            // List.of(new SimpleGrantedAuthority("ROLE_USER"))
-            // );
             String newAccessToken = jwtService.generateToken(user);
             return ResponseEntity.ok(
                     RefreshTokenResponse.builder()
