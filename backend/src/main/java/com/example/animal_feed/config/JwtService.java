@@ -3,8 +3,10 @@ package com.example.animal_feed.config;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -82,6 +84,13 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        @SuppressWarnings("unchecked")
+        List<String> roles = (List<String>) claims.get("roles");
+        return roles != null ? roles : Collections.emptyList();
     }
 
     public String extractTokenType(String token) {
