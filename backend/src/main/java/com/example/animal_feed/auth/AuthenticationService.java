@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.animal_feed.config.JwtService;
+import com.example.animal_feed.user.CustomUserDetails;
 import com.example.animal_feed.user.Role;
 import com.example.animal_feed.user.Users;
 import com.example.animal_feed.user.UserRepository;
@@ -46,8 +47,9 @@ public class AuthenticationService {
                         request.getPassword()));
         var user = userRepository.findByPhone(request.getPhone())
                 .orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        var userDetails = new CustomUserDetails(user);
+        var jwtToken = jwtService.generateToken(userDetails);
+        var refreshToken = jwtService.generateRefreshToken(userDetails);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
@@ -69,7 +71,8 @@ public class AuthenticationService {
                         .body(new RefreshTokenResponse(null, "User not found"));
             }
             Users user = userOptional.get();
-            String newAccessToken = jwtService.generateToken(user);
+            var userDetails = new CustomUserDetails(user);
+            String newAccessToken = jwtService.generateToken(userDetails);
             return ResponseEntity.ok(
                     RefreshTokenResponse.builder()
                             .token(newAccessToken)
