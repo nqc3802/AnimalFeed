@@ -5,6 +5,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +21,15 @@ public class UserService {
         return UsersMapper.INSTANCE.usersToUsersDTOPage(users);
     }
 
-    @Cacheable(value = "user", key = "#id") 
     public UserDTO getUser(int id) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails userDetails) {
+            if (userDetails.getId() != id) {
+                throw new AccessDeniedException("You are not authorized to access this resource");
+            }
+        } else {
+            throw new AccessDeniedException("Invalid authentication principal");
+        }
         Users user = userRepository.findById(id);
         return UsersMapper.INSTANCE.userToUserDTO(user);
     }
