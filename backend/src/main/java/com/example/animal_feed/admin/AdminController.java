@@ -20,6 +20,7 @@ import com.example.animal_feed.item.ItemEditDTO;
 import com.example.animal_feed.item.ItemService;
 import com.example.animal_feed.user.UserService;
 import com.example.animal_feed.user.UsersDTO;
+import com.example.animal_feed.user.UsersDeactivateDTO;
 
 @CrossOrigin
 @RequestMapping("/api/v1/admin")
@@ -37,6 +38,18 @@ public class AdminController {
         return userService.getAllUsers(page, size);
     }
 
+    @PutMapping("/user/deactivate/{id}")
+    public ResponseEntity<String> deactivateUser(@PathVariable int id) {
+        UsersDeactivateDTO deactivatedUser = userService.deactivateUser(id);
+        return ResponseEntity.status(200).body("User " + id + " deactivated successfully");
+    }
+
+    @PutMapping("/user/activate/{id}")
+    public ResponseEntity<String> activateUser(@PathVariable int id) {
+        UsersDeactivateDTO activatedUser = userService.activateUser(id);
+        return ResponseEntity.status(200).body("User " + id + " activated successfully");
+    }
+
     @PostMapping("/item/add")
     public ResponseEntity<ItemAddDTO> addItem(@RequestBody ItemAddDTO item) {
         ItemAddDTO savedItem = itemService.addItem(item);
@@ -51,8 +64,8 @@ public class AdminController {
     }
 
     @DeleteMapping("/item/{id}")
-    public ResponseEntity<ItemDeleteDTO> deleteItem(@PathVariable int id) {
+    public ResponseEntity<String> deleteItem(@PathVariable int id) {
         ItemDeleteDTO deletedItem = itemService.deleteItem(id);
-        return ResponseEntity.status(200).body(deletedItem);
+        return ResponseEntity.status(200).body("Item " + id + " deleted successfully");
     }
 }
