@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,5 +33,25 @@ public class UserService {
         }
         Users user = userRepository.findById(id);
         return UsersMapper.INSTANCE.userToUserDTO(user);
+    }
+
+    public UsersDeactivateDTO deactivateUser(int id) {
+        Users existingUser = userRepository.findById(id);
+        if (existingUser == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        existingUser.setState("INACTIVE");
+        userRepository.save(existingUser);
+        return UsersMapper.INSTANCE.userToUserDeactivateDTO(existingUser);
+    }
+
+    public UsersDeactivateDTO activateUser(int id) {
+        Users existingUser = userRepository.findById(id);
+        if (existingUser == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        existingUser.setState("ACTIVE");
+        userRepository.save(existingUser);
+        return UsersMapper.INSTANCE.userToUserDeactivateDTO(existingUser);
     }
 }
