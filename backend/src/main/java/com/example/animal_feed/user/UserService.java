@@ -54,4 +54,21 @@ public class UserService {
         userRepository.save(existingUser);
         return UsersMapper.INSTANCE.userToUserDeactivateDTO(existingUser);
     }
+
+    public UserEditRoleDTO editUserRole(int id, Role role) {
+        if (role == null) {
+            throw new IllegalArgumentException("Role cannot be null");
+        }
+        Users existingUser = userRepository.findById(id);
+        if (existingUser == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        try {
+            existingUser.setRole(role);
+            userRepository.save(existingUser);
+            return UsersMapper.INSTANCE.userToUserEditRoleDTO(existingUser);
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to update user role: " + ex.getMessage());
+        }
+    }
 }

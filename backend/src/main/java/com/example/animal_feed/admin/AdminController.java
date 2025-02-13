@@ -15,12 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.animal_feed.item.ItemAddDTO;
-import com.example.animal_feed.item.ItemDeleteDTO;
 import com.example.animal_feed.item.ItemEditDTO;
 import com.example.animal_feed.item.ItemService;
+import com.example.animal_feed.user.UserEditRoleDTO;
 import com.example.animal_feed.user.UserService;
 import com.example.animal_feed.user.UsersDTO;
-import com.example.animal_feed.user.UsersDeactivateDTO;
 
 @CrossOrigin
 @RequestMapping("/api/v1/admin")
@@ -40,14 +39,20 @@ public class AdminController {
 
     @PutMapping("/user/deactivate/{id}")
     public ResponseEntity<String> deactivateUser(@PathVariable int id) {
-        UsersDeactivateDTO deactivatedUser = userService.deactivateUser(id);
+        userService.deactivateUser(id);
         return ResponseEntity.status(200).body("User " + id + " deactivated successfully");
     }
 
     @PutMapping("/user/activate/{id}")
     public ResponseEntity<String> activateUser(@PathVariable int id) {
-        UsersDeactivateDTO activatedUser = userService.activateUser(id);
+        userService.activateUser(id);
         return ResponseEntity.status(200).body("User " + id + " activated successfully");
+    }
+
+    @PutMapping("/user/edit-role/{id}")
+    public ResponseEntity<UserEditRoleDTO> editUserRole(@PathVariable int id, @RequestBody UserEditRoleDTO roles) {
+        userService.editUserRole(id, roles.getRole());
+        return ResponseEntity.status(200).body(roles);
     }
 
     @PostMapping("/item/add")
@@ -65,7 +70,7 @@ public class AdminController {
 
     @DeleteMapping("/item/{id}")
     public ResponseEntity<String> deleteItem(@PathVariable int id) {
-        ItemDeleteDTO deletedItem = itemService.deleteItem(id);
+        itemService.deleteItem(id);
         return ResponseEntity.status(200).body("Item " + id + " deleted successfully");
     }
 }
