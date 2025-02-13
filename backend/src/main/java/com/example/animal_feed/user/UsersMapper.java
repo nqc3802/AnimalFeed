@@ -17,6 +17,9 @@ public interface UsersMapper {
     UsersDeactivateDTO userToUserDeactivateDTO(Users user);
     Users userDeactivateDTOToUser(UsersDeactivateDTO userDTO);
 
+    UserEditRoleDTO userToUserEditRoleDTO(Users user);
+    Users userEditRoleDTOToUser(UserEditRoleDTO userDTO);
+
     default Page<UsersDTO> usersToUsersDTOPage(Page<Users> users) {
         return users.map(this::usersToUsersDTO);
     }
