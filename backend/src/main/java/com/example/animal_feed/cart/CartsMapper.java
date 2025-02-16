@@ -11,6 +11,9 @@ public interface CartsMapper {
     CartDTO cartsToCartDTO(Carts cart);
     Carts cartDTOToCarts(CartDTO cartDTO);
 
+    CartDeleteDTO cartsToCartDeleteDTO(Carts cart);
+    Carts cartDeleteDTOToCarts(CartDeleteDTO cartDeleteDTO);
+
     default Page<CartDTO> cartsToCartDTOPage(Page<Carts> carts) {
         return carts.map(this::cartsToCartDTO);
     }
