@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class CartDTO {
     private int itemId;
 
-    @Min(value = 1, message = "Số lượng sản phẩm phải lớn hơn hoặc bằng 1.")
+    @Min(value = 1, message = "Quantity must be greater than 0")
     private int quantity;
 }
