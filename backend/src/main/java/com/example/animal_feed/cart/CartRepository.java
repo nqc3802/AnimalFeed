@@ -1,5 +1,6 @@
 package com.example.animal_feed.cart;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -11,4 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface CartRepository extends JpaRepository<Carts, Integer> {
     Slice<Carts> findByUserId(int userId, Pageable pageable);
     Optional<Carts> findByUserIdAndItemId(int userId, int itemId);
+    List<Carts> findByUserId(int userId);
+    void deleteByUserId(int userId);
 }
