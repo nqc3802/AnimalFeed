@@ -13,7 +13,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderRepository extends JpaRepository<Orders, Integer>{
     Slice<Orders> findByUserId(int userId, Pageable pageable);
-    Optional<Orders> findById(int id);
+    
+    @Query("SELECT o.state FROM Orders o WHERE o.id = :id")
+    Optional<State> findOrderStateById(@Param("id") int id);
+    
     @Modifying
     @Query("UPDATE Orders o SET o.state = :state WHERE o.id = :id")
     void updateOrderState(@Param("id") int id, @Param("state") State state);

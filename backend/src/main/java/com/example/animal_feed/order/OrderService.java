@@ -91,15 +91,16 @@ public class OrderService {
         cartRepository.deleteByUserId(userId);
     }
 
+    @Transactional
     public void confirmOrder(int orderId) {
-        Orders order = orderRepository.findById(orderId)
+        State currentState = orderRepository.findOrderStateById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
         
-        if (order.getState() == State.CONFIRMED) {
+        if (currentState  == State.CONFIRMED) {
             throw new OrderStateException("Order is already confirmed.");
         }
 
-        if (order.getState() != State.ORDERED) {
+        if (currentState  != State.ORDERED) {
             throw new OrderStateException("Order is not in ORDERED state.");
         }
 
