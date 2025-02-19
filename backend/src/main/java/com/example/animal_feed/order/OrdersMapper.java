@@ -11,6 +11,9 @@ public interface OrdersMapper {
     OrderDTO ordersToOrderDTO(Orders order);
     Orders orderDTOToOrders(OrderDTO orderDTO);
 
+    OrderStateDTO ordersToOrderStateDTO(Orders order);
+    Orders orderStateDTOToOrders(OrderStateDTO orderStateDTO);
+
     default Page<OrderDTO> ordersToOrderDTOPage(Page<Orders> orders) {
         return orders.map(this::ordersToOrderDTO);
     }
