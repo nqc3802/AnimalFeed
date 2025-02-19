@@ -18,6 +18,8 @@ import com.example.animal_feed.cart.Carts;
 import com.example.animal_feed.exception.CartEmptyException;
 import com.example.animal_feed.exception.CartQuantityException;
 import com.example.animal_feed.exception.ItemNotFoundException;
+import com.example.animal_feed.exception.OrderNotFoundException;
+import com.example.animal_feed.exception.OrderStateException;
 import com.example.animal_feed.item.ItemRepository;
 import com.example.animal_feed.item.Items;
 
@@ -40,16 +42,6 @@ public class OrderService {
         Slice<Orders> orders = orderRepository.findByUserId(userId, pageable);
         return orders.map(OrdersMapper.INSTANCE::ordersToOrderDTO);
     }
-
-    /*
-     * Kiểm tra sản phẩm có tồn tại không.
-     * Kiểm tra số lượng hợp lệ.
-     * Kiểm tra sản phẩm có trong giỏ hàng không.
-     * Lấy giá từ bảng Items.
-     * Tính tổng hóa đơn và lưu vào bảng Bill.
-     * Lưu đơn hàng (Order) với thông tin hóa đơn.
-     * Xóa sản phẩm khỏi giỏ hàng.
-     */
 
     @Transactional
     public void placeOrder(int userId) {
@@ -97,6 +89,21 @@ public class OrderService {
         orderRepository.saveAll(ordersList);
 
         cartRepository.deleteByUserId(userId);
+    }
+
+    public void confirmOrder(int orderId) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+        
+        if (order.getState() == State.CONFIRMED) {
+            throw new OrderStateException("Order is already confirmed.");
+        }
+
+        if (order.getState() != State.ORDERED) {
+            throw new OrderStateException("Order is not in ORDERED state.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.CONFIRMED);
     }
 
     private void checkIfItemNotFound(int itemId) {

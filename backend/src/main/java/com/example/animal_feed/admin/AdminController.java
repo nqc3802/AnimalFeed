@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.animal_feed.item.ItemAddDTO;
 import com.example.animal_feed.item.ItemEditDTO;
 import com.example.animal_feed.item.ItemService;
+import com.example.animal_feed.order.OrderService;
 import com.example.animal_feed.user.UserEditRoleDTO;
 import com.example.animal_feed.user.UserService;
 import com.example.animal_feed.user.UsersDTO;
@@ -30,6 +32,9 @@ public class AdminController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping
     public Page<UsersDTO> getAllUsers(@RequestParam(defaultValue = "0") int page,
@@ -71,6 +76,12 @@ public class AdminController {
     @DeleteMapping("/item/{id}")
     public ResponseEntity<String> deleteItem(@PathVariable int id) {
         itemService.deleteItem(id);
-        return ResponseEntity.status(200).body("Item " + id + " deleted successfully");
+        return ResponseEntity.status(200).body("Item " + id + " deleted successfully.");
+    }
+
+    @PatchMapping("/orders/confirm")
+    public ResponseEntity<String> confirmOrder(@RequestParam int id) {
+        orderService.confirmOrder(id);
+        return ResponseEntity.status(200).body("Order confirmed successfully.");
     }
 }
