@@ -71,4 +71,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(BillNotFoundException.class)
+    public ResponseEntity<String> handleBillNotFoundException(BillNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(OrderNotLinkedException.class)
+    public ResponseEntity<String> handleOrderNotLinkedException(OrderNotLinkedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }
