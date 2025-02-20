@@ -94,10 +94,10 @@ public class AdminController {
 
     @PatchMapping("/orders/confirm")
     public ResponseEntity<String> confirmOrder(@RequestParam int id) {
+        orderService.confirmOrder(id);
         try {
-            orderService.confirmOrder(id);
             String email = orderService.getEmail(id);
-            if(email != null) {
+            if (email != null && !email.trim().isEmpty()) {
                 emailService.sendEmail(email, "Order confirmed", "Your order has been confirmed.");
             }
             return ResponseEntity.status(200).body("Order confirmed successfully.");
@@ -113,10 +113,10 @@ public class AdminController {
 
     @PatchMapping("/orders/reject")
     public ResponseEntity<String> rejectOrder(@RequestParam int id) {
+        orderService.rejectOrder(id);
         try {
-            orderService.rejectOrder(id);
             String email = orderService.getEmail(id);
-            if(email != null) {
+            if (email != null && !email.trim().isEmpty()) {
                 emailService.sendEmail(email, "Order rejected", "Your order has been rejected.");
             }
             return ResponseEntity.status(200).body("Order rejected successfully.");
