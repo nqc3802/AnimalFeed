@@ -24,4 +24,7 @@ public interface OrderRepository extends JpaRepository<Orders, Integer>{
     @Modifying
     @Query("UPDATE Orders o SET o.state = :state WHERE o.id = :id")
     void updateOrderState(@Param("id") int id, @Param("state") State state);
+
+    @Query("SELECT u.email FROM Orders o JOIN o.user u WHERE o.id = :id")
+    Optional<String> findEmailByOrderId(@Param("id") int id);
 }

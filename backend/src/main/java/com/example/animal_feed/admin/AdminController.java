@@ -2,7 +2,9 @@ package com.example.animal_feed.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.animal_feed.email.EmailService;
 import com.example.animal_feed.item.ItemAddDTO;
 import com.example.animal_feed.item.ItemEditDTO;
 import com.example.animal_feed.item.ItemService;
@@ -36,6 +39,9 @@ public class AdminController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public Page<UsersDTO> getAllUsers(@RequestParam(defaultValue = "0") int page,
@@ -88,14 +94,40 @@ public class AdminController {
 
     @PatchMapping("/orders/confirm")
     public ResponseEntity<String> confirmOrder(@RequestParam int id) {
-        orderService.confirmOrder(id);
-        return ResponseEntity.status(200).body("Order confirmed successfully.");
+        try {
+            orderService.confirmOrder(id);
+            String email = orderService.getEmail(id);
+            if(email != null) {
+                emailService.sendEmail(email, "Order confirmed", "Your order has been confirmed.");
+            }
+            return ResponseEntity.status(200).body("Order confirmed successfully.");
+        } catch (MailException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred, please try again later");
+        }
     }
 
     @PatchMapping("/orders/reject")
     public ResponseEntity<String> rejectOrder(@RequestParam int id) {
-        orderService.rejectOrder(id);
-        return ResponseEntity.status(200).body("Order rejected successfully.");
+        try {
+            orderService.rejectOrder(id);
+            String email = orderService.getEmail(id);
+            if(email != null) {
+                emailService.sendEmail(email, "Order rejected", "Your order has been rejected.");
+            }
+            return ResponseEntity.status(200).body("Order rejected successfully.");
+        } catch (MailException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred, please try again later");
+        }
     }
 
     @GetMapping("/returns")

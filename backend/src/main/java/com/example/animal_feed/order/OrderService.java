@@ -153,6 +153,10 @@ public class OrderService {
         return returns.map(OrdersMapper.INSTANCE::ordersToOrderRequestDTO);
     }
 
+    public String getEmail(int orderId) {
+        return orderRepository.findEmailByOrderId(orderId).orElse(null);
+    }
+
     private void checkIfItemNotFound(int itemId) {
         if (!itemRepository.existsById(itemId)) {
             throw new ItemNotFoundException("Item with id " + itemId + " not found.");
