@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.animal_feed.item.ItemAddDTO;
 import com.example.animal_feed.item.ItemEditDTO;
 import com.example.animal_feed.item.ItemService;
+import com.example.animal_feed.order.OrderRequestDTO;
 import com.example.animal_feed.order.OrderService;
 import com.example.animal_feed.user.UserEditRoleDTO;
 import com.example.animal_feed.user.UserService;
@@ -79,9 +80,28 @@ public class AdminController {
         return ResponseEntity.status(200).body("Item " + id + " deleted successfully.");
     }
 
+    @GetMapping("/orders")
+    public Page<OrderRequestDTO> getOrders(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return orderService.getOrders(page, size);
+    }
+
     @PatchMapping("/orders/confirm")
     public ResponseEntity<String> confirmOrder(@RequestParam int id) {
         orderService.confirmOrder(id);
         return ResponseEntity.status(200).body("Order confirmed successfully.");
     }
+
+    @PatchMapping("/orders/reject")
+    public ResponseEntity<String> rejectOrder(@RequestParam int id) {
+        orderService.rejectOrder(id);
+        return ResponseEntity.status(200).body("Order rejected successfully.");
+    }
+
+    @GetMapping("/returns")
+    public Page<OrderRequestDTO> getReturns(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return orderService.getReturns(page, size);
+    }
+
 }
