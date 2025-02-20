@@ -12,19 +12,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Orders, Integer>{
+public interface OrderRepository extends JpaRepository<Orders, Integer> {
     Slice<Orders> findByUserId(int userId, Pageable pageable);
 
     @Query("SELECT o FROM Orders o WHERE o.state = :state")
     Page<Orders> findByState(@Param("state") State state, Pageable pageable);
-    
+
     @Query("SELECT o.state FROM Orders o WHERE o.id = :id")
     Optional<State> findOrderStateById(@Param("id") int id);
-    
+
     @Modifying
     @Query("UPDATE Orders o SET o.state = :state WHERE o.id = :id")
     void updateOrderState(@Param("id") int id, @Param("state") State state);
-
-    @Query("SELECT u.email FROM Orders o JOIN o.user u WHERE o.id = :id")
+    
+    @Query("SELECT u.email FROM Users u JOIN Orders o ON u.id = o.userId WHERE o.id = :id")
     Optional<String> findEmailByOrderId(@Param("id") int id);
 }
