@@ -39,4 +39,16 @@ public class OrderController {
         orderService.cancelOrder(userDetails.getId(), orderId);
         return ResponseEntity.status(200).body("Order canceled successfully.");
     }
+
+    @PatchMapping("/exchange")
+    public ResponseEntity<String> requestExchange(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam int orderId) {
+        orderService.requestExchange(userDetails.getId(), orderId);
+        return ResponseEntity.status(200).body("Exchange requested successfully.");
+    }
+
+    @PatchMapping("/return")
+    public ResponseEntity<String> requestReturn(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam int orderId) {
+        orderService.requestReturn(userDetails.getId(), orderId);
+        return ResponseEntity.status(200).body("Return requested successfully.");
+    }
 }
