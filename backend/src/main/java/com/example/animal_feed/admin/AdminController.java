@@ -136,4 +136,86 @@ public class AdminController {
         return orderService.getReturns(page, size);
     }
 
+    @PatchMapping("/returns/approve")
+    public ResponseEntity<String> approveReturn(@RequestParam int id) {
+        orderService.approveReturn(id);
+        try {
+            String email = orderService.getEmail(id);
+            if (email != null && !email.trim().isEmpty()) {
+                emailService.sendEmail(email, "Return approved", "Your return has been approved.");
+            }
+            return ResponseEntity.status(200).body("Return approved successfully.");
+        } catch (MailException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred, please try again later");
+        }
+    }
+
+    @PatchMapping("/returns/reject")
+    public ResponseEntity<String> rejectReturn(@RequestParam int id) {
+        orderService.rejectReturn(id);
+        try {
+            String email = orderService.getEmail(id);
+            if (email != null && !email.trim().isEmpty()) {
+                emailService.sendEmail(email, "Return rejected", "Your return has been rejected.");
+            }
+            return ResponseEntity.status(200).body("Return rejected successfully.");
+        } catch (MailException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred, please try again later");
+        }
+    }
+
+    @GetMapping("/exchange")
+    public Page<OrderRequestDTO> getExchanges(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return orderService.getExchanges(page, size);
+    }
+
+    @PatchMapping("/exchange/approve")
+    public ResponseEntity<String> approveExchange(@RequestParam int id) {
+        orderService.approveExchange(id);
+        try {
+            String email = orderService.getEmail(id);
+            if (email != null && !email.trim().isEmpty()) {
+                emailService.sendEmail(email, "Exchange approved", "Your exchange has been approved.");
+            }
+            return ResponseEntity.status(200).body("Exchange approved successfully.");
+        } catch (MailException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred, please try again later");
+        }
+    }
+
+    @PatchMapping("/exchange/reject")
+    public ResponseEntity<String> rejectExchange(@RequestParam int id) {
+        orderService.rejectExchange(id);
+        try {
+            String email = orderService.getEmail(id);
+            if (email != null && !email.trim().isEmpty()) {
+                emailService.sendEmail(email, "Exchange rejected", "Your exchange has been rejected.");
+            }
+            return ResponseEntity.status(200).body("Exchange rejected successfully.");
+        } catch (MailException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred, please try again later");
+        }
+    }
+
 }
