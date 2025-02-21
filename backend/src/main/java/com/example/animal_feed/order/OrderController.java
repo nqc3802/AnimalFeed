@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,5 +32,11 @@ public class OrderController {
     public ResponseEntity<String> placeOrder(@AuthenticationPrincipal CustomUserDetails userDetails) {
         orderService.placeOrder(userDetails.getId());
         return ResponseEntity.status(201).body("Order placed successfully.");
+    }
+
+    @PatchMapping("/cancel")
+    public ResponseEntity<String> cancelOrder(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam int orderId) {
+        orderService.cancelOrder(userDetails.getId(), orderId);
+        return ResponseEntity.status(200).body("Order canceled successfully.");
     }
 }

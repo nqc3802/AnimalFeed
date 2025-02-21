@@ -94,6 +94,24 @@ public class OrderService {
         cartRepository.deleteByUserId(userId);
     }
 
+    @Transactional
+    public void cancelOrder(int userId, int orderId) {
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+
+        if (order.getState() == State.CANCELLED) {
+            throw new OrderStateException("Order is already canceled.");
+        }
+
+        if (order.getState() != State.ORDERED) {
+            throw new OrderStateException("Order is not in ORDERED state, cannot cancel.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.CANCELLED);
+
+        updateBillTotalAmount(order);
+    }
+
     public Page<OrderRequestDTO> getOrders(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Orders> orders = orderRepository.findByState(State.ORDERED, pageable);
