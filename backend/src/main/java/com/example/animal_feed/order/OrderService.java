@@ -152,6 +152,119 @@ public class OrderService {
         updateBillTotalAmount(order);
     }
 
+    @Transactional
+    public void requestExchange(int userId, int orderId) {
+        State currentState = orderRepository.findOrderStateById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+
+        if (currentState == State.EXCHANGE_REQUESTED) {
+            throw new OrderStateException("Exchange is already requested.");
+        }
+
+        if (currentState != State.DELIVERED) {
+            throw new OrderStateException("Order is not delivered yet, cannot request exchange.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.EXCHANGE_REQUESTED);
+    }
+
+    @Transactional
+    public void requestReturn(int userId, int orderId) {
+        State currentState = orderRepository.findOrderStateById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+
+        if (currentState == State.RETURN_REQUESTED) {
+            throw new OrderStateException("Return is already requested.");
+        }
+
+        if (currentState != State.DELIVERED) {
+            throw new OrderStateException("Order is not delivered yet, cannot request return.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.RETURN_REQUESTED);
+    }
+
+    public Page<OrderRequestDTO> getReturns(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Orders> returns = orderRepository.findByState(State.RETURN_REQUESTED, pageable);
+        return returns.map(OrdersMapper.INSTANCE::ordersToOrderRequestDTO);
+    }
+
+    @Transactional
+    public void approveReturn(int orderId) {
+        State currentState = orderRepository.findOrderStateById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+        
+
+        if (currentState == State.RETURN_APPROVED) {
+            throw new OrderStateException("Return is already approved.");
+        }
+
+        if (currentState != State.RETURN_REQUESTED) {
+            throw new OrderStateException("Order is not in RETURN_REQUESTED state.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.RETURN_APPROVED);
+    }
+
+    @Transactional
+    public void rejectReturn(int orderId) {
+        State currentState = orderRepository.findOrderStateById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+
+        if (currentState == State.RETURN_REJECTED) {
+            throw new OrderStateException("Return is already rejected.");
+        }
+
+        if (currentState != State.RETURN_REQUESTED) {
+            throw new OrderStateException("Order is not in RETURN_REQUESTED state.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.RETURN_REJECTED);
+    }
+
+    public Page<OrderRequestDTO> getExchanges(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Orders> exchanges = orderRepository.findByState(State.EXCHANGE_REQUESTED, pageable);
+        return exchanges.map(OrdersMapper.INSTANCE::ordersToOrderRequestDTO);
+    }
+
+    @Transactional
+    public void approveExchange(int orderId) {
+        State currentState = orderRepository.findOrderStateById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+
+        if (currentState == State.EXCHANGE_APPROVED) {
+            throw new OrderStateException("Exchange is already approved.");
+        }
+
+        if (currentState != State.EXCHANGE_REQUESTED) {
+            throw new OrderStateException("Order is not in EXCHANGE_REQUESTED state.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.EXCHANGE_APPROVED);
+    }
+
+    @Transactional
+    public void rejectExchange(int orderId) {
+        State currentState = orderRepository.findOrderStateById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + orderId + " not found."));
+
+        if (currentState == State.EXCHANGE_REJECTED) {
+            throw new OrderStateException("Exchange is already rejected.");
+        }
+
+        if (currentState != State.EXCHANGE_REQUESTED) {
+            throw new OrderStateException("Order is not in EXCHANGE_REQUESTED state.");
+        }
+
+        orderRepository.updateOrderState(orderId, State.EXCHANGE_REJECTED);
+    }
+
+    public String getEmail(int orderId) {
+        return orderRepository.findEmailByOrderId(orderId).orElse(null);
+    }
+
     private void updateBillTotalAmount(Orders order) {
         if (order.getBillId() == 0) {
             throw new OrderNotLinkedException("Order is not linked to a valid bill.");
@@ -163,16 +276,6 @@ public class OrderService {
         bill.setTotalAmount(bill.getTotalAmount() - order.getAmount());
 
         billRepository.save(bill);
-    }
-
-    public Page<OrderRequestDTO> getReturns(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Orders> returns = orderRepository.findByState(State.RETURN_REQUESTED, pageable);
-        return returns.map(OrdersMapper.INSTANCE::ordersToOrderRequestDTO);
-    }
-
-    public String getEmail(int orderId) {
-        return orderRepository.findEmailByOrderId(orderId).orElse(null);
     }
 
     private void checkIfItemNotFound(int itemId) {
