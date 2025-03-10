@@ -13,6 +13,9 @@ import com.example.animal_feed.config.JwtService;
 import com.example.animal_feed.user.CustomUserDetails;
 import com.example.animal_feed.user.Role;
 import com.example.animal_feed.user.Users;
+
+import jakarta.transaction.Transactional;
+
 import com.example.animal_feed.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -100,6 +103,7 @@ public class AuthenticationService {
         }
     }
 
+    @Transactional
     public ResponseEntity<String> logout(String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
         return ResponseEntity.ok("Logout successful");
