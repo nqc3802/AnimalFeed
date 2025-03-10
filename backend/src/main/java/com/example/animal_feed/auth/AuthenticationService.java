@@ -26,6 +26,9 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public ResponseEntity<String> register(RegisterRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
+        }
         var user = Users.builder()
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))

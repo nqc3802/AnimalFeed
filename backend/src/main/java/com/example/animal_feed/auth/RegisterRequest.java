@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class RegisterRequest {
     private String phone;
     private String password;
+    private String confirmPassword;
     private String name;
     private String gender;
     @Builder.Default
