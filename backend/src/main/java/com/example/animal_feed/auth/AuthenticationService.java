@@ -100,4 +100,9 @@ public class AuthenticationService {
         }
     }
 
+    public ResponseEntity<String> logout(String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+        return ResponseEntity.ok("Logout successful");
+    }
+
 }

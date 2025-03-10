@@ -65,4 +65,10 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        return authenticationService.logout(refreshToken);
+    }
+
 }
