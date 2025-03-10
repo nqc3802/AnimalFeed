@@ -24,6 +24,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public ResponseEntity<String> register(RegisterRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
@@ -53,6 +54,12 @@ public class AuthenticationService {
         var userDetails = new CustomUserDetails(user);
         var jwtToken = jwtService.generateToken(userDetails);
         var refreshToken = jwtService.generateRefreshToken(userDetails);
+        RefreshToken tokenEntity = RefreshToken.builder()
+                .userId(user.getId())
+                .token(refreshToken)
+                .build();
+        refreshTokenRepository.save(tokenEntity);
+
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
@@ -63,6 +70,12 @@ public class AuthenticationService {
         if (refreshToken == null || refreshToken.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new RefreshTokenResponse(null, "Refresh token is required"));
+        }
+
+        Optional<RefreshToken> storedToken = refreshTokenRepository.findByToken(refreshToken);
+        if (storedToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new RefreshTokenResponse(null, "Invalid refresh token"));
         }
 
         if (jwtService.isTokenValid(refreshToken) && "REFRESH".equals(jwtService.extractTokenType(refreshToken))) {
