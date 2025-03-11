@@ -20,6 +20,9 @@ public interface UsersMapper {
     UserEditRoleDTO userToUserEditRoleDTO(Users user);
     Users userEditRoleDTOToUser(UserEditRoleDTO userDTO);
 
+    SimpleUserDTO userToSimpleUserDTO(Users user);
+    Users simpleUserDTOToUser(SimpleUserDTO userDTO);
+
     default Page<UsersDTO> usersToUsersDTOPage(Page<Users> users) {
         return users.map(this::usersToUsersDTO);
     }

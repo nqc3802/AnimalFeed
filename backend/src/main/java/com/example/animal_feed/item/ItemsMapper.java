@@ -20,6 +20,9 @@ public interface ItemsMapper {
     ItemDeleteDTO itemsToItemDeleteDTO(Items item);
     Items itemDeleteDTOToItems(ItemDeleteDTO itemDeleteDTO);
 
+    SimpleItemDTO itemsToSimpleItemDTO(Items item);
+    Items simpleItemDTOToItems(SimpleItemDTO simpleItemDTO);
+
     default Page<ItemsDTO> itemsToItemsDTOPage(Page<Items> items) {
         return items.map(this::itemsToItemsDTO);
     }
