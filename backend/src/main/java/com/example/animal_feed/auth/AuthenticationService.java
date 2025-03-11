@@ -9,9 +9,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.animal_feed.config.JwtService;
+import com.example.animal_feed.exception.InvalidLoginException;
 import com.example.animal_feed.user.CustomUserDetails;
 import com.example.animal_feed.user.Role;
 import com.example.animal_feed.user.Users;
@@ -59,11 +59,11 @@ public class AuthenticationService {
                             request.getPhone(),
                             request.getPassword()));
         } catch (AuthenticationException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number or password");
+            throw new InvalidLoginException("Invalid phone number or password");
         }
         var user = userRepository.findByPhone(request.getPhone())
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number or password"));
+                        () -> new InvalidLoginException("Invalid phone number or password"));
         var userDetails = new CustomUserDetails(user);
         var jwtToken = jwtService.generateToken(userDetails);
         var refreshToken = jwtService.generateRefreshToken(userDetails);
