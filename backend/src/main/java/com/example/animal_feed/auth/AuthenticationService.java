@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.animal_feed.config.JwtService;
 import com.example.animal_feed.user.CustomUserDetails;
@@ -33,6 +35,9 @@ public class AuthenticationService {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
         }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number already exists");
+        }
         var user = Users.builder()
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -48,12 +53,17 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getPhone(),
-                        request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getPhone(),
+                            request.getPassword()));
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number or password");
+        }
         var user = userRepository.findByPhone(request.getPhone())
-                .orElseThrow();
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid phone number or password"));
         var userDetails = new CustomUserDetails(user);
         var jwtToken = jwtService.generateToken(userDetails);
         var refreshToken = jwtService.generateRefreshToken(userDetails);
