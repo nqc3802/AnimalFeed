@@ -29,10 +29,10 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/v1/cart/**", "/api/v1/orders/**", "/api/v1/reviews/**", "/api/v1/user/**")
+                        .requestMatchers("/api/v1/cart/**", "/api/v1/orders/**", "/api/v1/reviews/add/**", "/api/v1/user/**")
                         .access(authorizationManager)
 
-                        .requestMatchers("/api/v1/item/**").authenticated()
+                        .requestMatchers("/api/v1/item/**", "/api/v1/reviews/view/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
