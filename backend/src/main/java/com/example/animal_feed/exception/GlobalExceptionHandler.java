@@ -92,4 +92,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(FeedbackExistsException.class)
+    public ResponseEntity<String> handleFeedbackExistsException(FeedbackExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedFeedbackException.class)
+    public ResponseEntity<String> handleUnauthorizedFeedbackException(UnauthorizedFeedbackException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ex.getMessage());
+    }
 }
