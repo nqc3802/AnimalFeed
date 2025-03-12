@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedbacks, Integer> {
     Page<Feedbacks> findByItemId(int itemId, Pageable pageable);
+
+    boolean existsByOrderId(int orderId);
 }
