@@ -11,6 +11,9 @@ public interface FeedbacksMapper {
     FeedbackDTO feedbacksToFeedbackDTO(Feedbacks feedback);
     Feedbacks feedbackDTOToFeedbacks(FeedbackDTO feedbackDTO);
 
+    FeedbackAddDTO feedbacksToFeedbackAddDTO(Feedbacks feedback);
+    Feedbacks feedbackAddDTOToFeedbacks(FeedbackAddDTO feedbackAddDTO);
+
     default Page<FeedbackDTO> feedbacksToFeedbackDTOPage(Page<Feedbacks> feedbacks) {
         return feedbacks.map(this::feedbacksToFeedbackDTO);
     }
