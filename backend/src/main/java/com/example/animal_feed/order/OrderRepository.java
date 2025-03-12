@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Orders, Integer> {
+    Optional<Orders> findById(int id);
+
     Slice<Orders> findByUserId(int userId, Pageable pageable);
 
     @Query("SELECT o FROM Orders o WHERE o.state = :state")
